@@ -957,7 +957,7 @@ select nombre, apellido1, apellido2, email from empleado where codigo_jefe = 7;
 show tables;
 describe empleado;
 select nombre, apellido1, apellido2, extension, email, codigo_oficina, codigo_jefe, puesto from empleado;
-select puesto, nombre apellido1, apellido2, email from empleado where puesto = 'Director General';
+select puesto, nombre, apellido1, apellido2, email from empleado where puesto = 'Director General';
 
 /*Reto E - Retorna un listado con el nombre, apellidos y puesto de aquellos empleados que no sean representantes de ventas.*/
 
@@ -972,7 +972,7 @@ show tables;
 describe cliente;
 select codigo_cliente, nombre_cliente, nombre_contacto, apellido_contacto, telefono, fax, linea_direccion1, linea_direccion2, ciudad,
 region, pais, codigo_postal, codigo_empleado_rep_ventas, limite_credito from cliente;
-select nombre_cliente from cliente where pais = 'Spain';
+select nombre_cliente, pais from cliente where pais = 'Spain';
 
 /*Reto G - Retorna un listado con los distintos estados por los que puede pasar un pedido.*/
 
@@ -991,7 +991,7 @@ select codigo_cliente, forma_pago, id_transaccion, fecha_pago, total from pago;
 	/*Utilizando la función YEAR de MySQL.*/
     select distinct codigo_cliente from pago where year(fecha_pago) = 2008;
 	/*Utilizando la función DATE_FORMAT de MySQL. *Sin utilizar ninguna de las funciones anteriores.*/
-    select distinct codigo_cliente from pago where date_format(fecha_pago, '%Y') = 2008;
+    select distinct codigo_cliente from pago where date_format(fecha_pago, '%Y') = '2008';
 
 /*Reto I - Genera un listado con el código de pedido, código de cliente, fecha esperada y fecha de entrega de los pedidos
 que no han sido entregados a tiempo.*/
@@ -999,7 +999,7 @@ que no han sido entregados a tiempo.*/
 SHOW TABLES;
 DESCRIBE pedido;
 SELECT codigo_pedido, fecha_pedido, fecha_esperada, fecha_entrega, estado, comentarios, codigo_cliente from pedido;
-SELECT codigo_pedido, codigo_cliente, fecha_entrega from pedido where fecha_entrega > fecha_esperada and estado = 'Entregado';
+SELECT codigo_pedido, codigo_cliente, fecha_esperada, fecha_entrega from pedido where fecha_entrega > fecha_esperada and estado = 'Entregado';
 
 /*Reto J - Genera un listado con el código de pedido, código de cliente, fecha esperada y fecha de entrega de los pedidos cuya
 fecha de entrega ha sido al menos dos días antes de la fecha esperada.*/
@@ -1009,11 +1009,12 @@ DESCRIBE pedido;
 SELECT codigo_pedido, fecha_pedido, fecha_esperada, fecha_entrega, estado, comentarios, codigo_cliente from pedido;
 
 	/*Utilizando la función ADDDATE de MySQL.*/
-    SELECT codigo_pedido, codigo_cliente, fecha_esperada, fecha_entrega FROM pedido WHERE fecha_entrega <= ADDDATE(fecha_esperada, INTERVAL -2 DAY);
+    SELECT codigo_pedido, codigo_cliente, fecha_esperada,fecha_entrega FROM pedido WHERE fecha_entrega <= fecha_esperada - INTERVAL 2 DAY;
 	/*Utilizando la función DATEDIFF de MySQL.*/
-    SELECT codigo_pedido, codigo_cliente, fecha_esperada, fecha_entrega FROM pedido WHERE fecha_entrega <= ADDDATE(fecha_esperada, INTERVAL -2 DAY);
+    SELECT codigo_pedido, codigo_cliente, fecha_esperada,fecha_entrega FROM pedido WHERE datediff (fecha_esperada, fecha_entrega) >= 2;
 	/*¿Sería posible resolver esta consulta utilizando el operador de suma + o resta -?*/
-
+    SELECT codigo_pedido, codigo_cliente, fecha_esperada,(fecha_entrega - INTERVAL 2 DAY) AS fecha_entrega FROM pedido WHERE fecha_entrega is not null;
+    
 /*Reto K - Genera un listado de todos los pedidos que fueron rechazados en 2009.*/
 
 SHOW TABLES;
@@ -1026,14 +1027,14 @@ SELECT codigo_pedido, fecha_pedido, fecha_esperada, fecha_entrega, estado, comen
 SHOW TABLES;
 DESCRIBE pedido;
 SELECT codigo_pedido, fecha_pedido, fecha_esperada, fecha_entrega, estado, comentarios, codigo_cliente from pedido;
-SELECT codigo_pedido, fecha_pedido, fecha_esperada, fecha_entrega, estado, comentarios, codigo_cliente from pedido WHERE MONTH(fecha_entrega) = 01;
+SELECT codigo_pedido, fecha_pedido, fecha_esperada, fecha_entrega, estado, comentarios, codigo_cliente from pedido WHERE MONTH(fecha_entrega) = 1;
 
 /*Reto M - Genera un listado con todos los pagos que se realizaron en el año 2008 mediante Paypal. Ordene el resultado de mayor a menor.*/
 
 show tables;
 describe pago;
 select codigo_cliente, forma_pago, id_transaccion, fecha_pago, total from pago;
-select codigo_cliente, forma_pago, id_transaccion, fecha_pago, total from pago WHERE YEAR(fecha_pago) = 2008 AND forma_pago = 'PayPal';
+select codigo_cliente, forma_pago, id_transaccion, fecha_pago, total from pago WHERE fecha_pago >= '2008-01-01' AND fecha_pago <= '2008-12-31' AND forma_pago = 'PayPal';
 
 /*Reto N - Genera un listado con todas las formas de pago que aparecen en la tabla pago. Tenga en cuenta que no deben aparecer formas de pago repetidas.*/
 
@@ -1057,4 +1058,4 @@ SHOW TABLES;
 DESCRIBE cliente;
 SELECT codigo_cliente, nombre_cliente, nombre_contacto, apellido_contacto, telefono, fax, linea_direccion1, linea_direccion2, ciudad,
 region, pais, codigo_postal, codigo_empleado_rep_ventas, limite_credito FROM cliente;
-SELECT nombre_cliente, ciudad, codigo_empleado_rep_ventas FROM cliente WHERE ciudad = 'Madrid' AND codigo_empleado_rep_ventas = 11 OR codigo_empleado_rep_ventas = 30;
+SELECT nombre_cliente, ciudad, codigo_empleado_rep_ventas FROM cliente WHERE ciudad = 'Madrid' AND (codigo_empleado_rep_ventas = 11 OR codigo_empleado_rep_ventas = 30);
